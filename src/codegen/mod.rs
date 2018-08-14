@@ -1842,7 +1842,7 @@ impl CodeGenerator for CompInfo {
             }
 
             let mut method_names = Default::default();
-            if ctx.options().codegen_config.methods {
+            if ctx.options().codegen_config.methods() {
                 for method in self.methods() {
                     assert!(method.kind() != MethodKind::Constructor);
                     method.codegen_method(
@@ -1855,7 +1855,7 @@ impl CodeGenerator for CompInfo {
                 }
             }
 
-            if ctx.options().codegen_config.constructors {
+            if ctx.options().codegen_config.constructors() {
                 for sig in self.constructors() {
                     Method::new(
                         MethodKind::Constructor,
@@ -1872,7 +1872,7 @@ impl CodeGenerator for CompInfo {
                 }
             }
 
-            if ctx.options().codegen_config.destructors {
+            if ctx.options().codegen_config.destructors() {
                 if let Some((kind, destructor)) = self.destructor() {
                     debug_assert!(kind.is_destructor());
                     Method::new(kind, destructor, false).codegen_method(
@@ -1978,11 +1978,20 @@ impl MethodCodegen for Method {
         assert!({
             let cc = &ctx.options().codegen_config;
             match self.kind() {
-                MethodKind::Constructor => cc.constructors,
-                MethodKind::Destructor => cc.destructors,
-                MethodKind::VirtualDestructor { .. } => cc.destructors,
-                MethodKind::Static | MethodKind::Normal |
-                MethodKind::Virtual { .. } => cc.methods,
+                MethodKind::Constructor => {
+                    cc.constructors()
+                }
+                MethodKind::Destructor => {
+                    cc.destructors()
+                }
+                MethodKind::VirtualDestructor { .. } => {
+                    cc.destructors()
+                }
+                MethodKind::Static
+                | MethodKind::Normal
+                | MethodKind::Virtual { .. } => {
+                    cc.methods()
+                }
             }
         });
 

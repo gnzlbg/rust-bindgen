@@ -951,23 +951,23 @@ impl Item {
         let cc = &ctx.options().codegen_config;
         match *self.kind() {
             ItemKind::Module(..) => true,
-            ItemKind::Var(_) => cc.vars,
-            ItemKind::Type(_) => cc.types,
-            ItemKind::Function(ref f) => {
-                match f.kind() {
-                    FunctionKind::Function => cc.functions,
-                    FunctionKind::Method(MethodKind::Constructor) => {
-                        cc.constructors
-                    }
-                    FunctionKind::Method(MethodKind::Destructor) |
-                    FunctionKind::Method(MethodKind::VirtualDestructor { .. }) => {
-                        cc.destructors
-                    }
-                    FunctionKind::Method(MethodKind::Static) |
-                    FunctionKind::Method(MethodKind::Normal) |
-                    FunctionKind::Method(MethodKind::Virtual { .. }) => cc.methods,
+            ItemKind::Var(_) => cc.vars(),
+            ItemKind::Type(_) => cc.types(),
+            ItemKind::Function(ref f) => match f.kind() {
+                FunctionKind::Function => cc.functions(),
+                FunctionKind::Method(MethodKind::Constructor) => {
+                    cc.constructors()
                 }
-            }
+                FunctionKind::Method(MethodKind::Destructor) |
+                FunctionKind::Method(MethodKind::VirtualDestructor {
+                    ..
+                }) => cc.destructors(),
+                FunctionKind::Method(MethodKind::Static) |
+                FunctionKind::Method(MethodKind::Normal) |
+                FunctionKind::Method(MethodKind::Virtual { .. }) => {
+                    cc.methods()
+                }
+            },
         }
     }
 }
